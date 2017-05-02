@@ -5,7 +5,7 @@ var myRover = {
   positionx: 0,
   positiony: 0,
   direction: 'N',
-  roverready: false,
+  roverready: true,
   obstacles: [
               [2,3],
               [7,2],
@@ -28,6 +28,7 @@ var myRoverine = {
 
 var svgrover;
 var roverinput;
+var roverineinput;
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -70,16 +71,13 @@ document.addEventListener("DOMContentLoaded", function(event)
     console.log(svgmyRover);
     svgmyRover.setAttribute("class","rotate270");
 
-    var alertalien=document.getElementById('alertalien');
-    alertalien.addEventListener("click",function(){
-      alertalien.setAttribute("style","display: none;");
-      if(myRover.roverready){
+    if(myRover.roverready){
         roverinput.focus();
-      }
-      else if(myRoverine.roverready){
+    }
+    else if(myRoverine.roverready){
         roverineinput.focus();
-      }
-    });
+    }
+
     //MY ROVERINE IMAGE
     svgmyRoverine=document.getElementById("myroverinesvg");
     console.log(svgmyRoverine);
@@ -92,6 +90,7 @@ document.addEventListener("DOMContentLoaded", function(event)
 
 
 function goForward(rover) {
+  var overlay_2rover=document.getElementById('alertrover');
   var currentRover;
   if(rover===myRover){
     currentRover="svg-wrapper";
@@ -103,6 +102,7 @@ function goForward(rover) {
 
   switch(rover.direction) {
     case 'N':
+      var axis='Y';
       var roverpred=rover.position[1]+1;
       // !!!!! if I do this var roverpred=rover.position[1]++ it will increase number in original object MyRover!
       console.log(rover.position[1]);
@@ -121,14 +121,15 @@ function goForward(rover) {
               {
 
             console.log("Aargh Alien!!");
-            alertalien.setAttribute("style","display: block;");
+            //alertalien.setAttribute("style","display: block;");
+            shakeAlien(roverpred, rover, axis);
 
-      }
+          }
       else if ((myRover.roverready)&&(roverpred===myRoverine.position[1])&&(myRover.position[0]===myRoverine.position[0])
               ||
               (myRoverine.roverready)&&(roverpred===myRover.position[1])&&(myRoverine.position[0]===myRover.position[0]))
       {
-        alert("something here");
+        displayRoverAlert(overlay_2rover);
       }
       else{
         rover.position[1]++;
@@ -142,6 +143,7 @@ function goForward(rover) {
       }
       break;
     case 'E':
+      var axis='X';
       var roverpred=rover.position[0]+1;
       console.log("roverpred",roverpred);
       console.log(myRover.roverready);
@@ -157,14 +159,20 @@ function goForward(rover) {
               (roverpred===rover.obstacles[2][0])&&(rover.position[1]===rover.obstacles[2][1]))
               {
 
+            shakeAlien(roverpred, rover, axis);
             console.log("Aargh Alien!!");
-            alertalien.setAttribute("style","display: block;");
-      }
+
+
+
+              //alien72.style.webkitAnimationPlayState="paused";
+              //alien72.style.webkitAnimationPlayState="running";
+              //alertalien.setAttribute("style","display: block;");
+            }
       else if ((myRover.roverready)&&(roverpred===myRoverine.position[0])&&(myRover.position[1]===myRoverine.position[1])
               ||
               (myRoverine.roverready)&&(roverpred===myRover.position[0])&&(myRoverine.position[1]===myRover.position[1]))
       {
-        alert("something here");
+        displayRoverAlert(overlay_2rover);
       }
       else{
         rover.position[0]++;
@@ -176,6 +184,7 @@ function goForward(rover) {
       }
       break;
     case 'S':
+      var axis='Y';
       var roverpred=rover.position[1]-1;
       if (rover.position[1]===0){
         console.log("cannot move further South");
@@ -188,13 +197,14 @@ function goForward(rover) {
               {
 
             console.log("Aargh Alien!!");
-            alertalien.setAttribute("style","display: block;");
+            shakeAlien(roverpred, rover, axis);
+            //alertalien.setAttribute("style","display: block;");
       }
       else if ((myRover.roverready)&&(roverpred===myRoverine.position[1])&&(myRover.position[0]===myRoverine.position[0])
               ||
               (myRoverine.roverready)&&(roverpred===myRover.position[1])&&(myRoverine.position[0]===myRover.position[0]))
       {
-        alert("something here");
+        displayRoverAlert(overlay_2rover);
       }
 
       else{
@@ -207,7 +217,7 @@ function goForward(rover) {
       }
       break;
     case 'W':
-
+      var axis='X';
       var roverpred=rover.position[0]-1;
       console.log("roverpred",roverpred)
       console.log("myRoverine.positionx",myRoverine.position[0]);
@@ -222,7 +232,8 @@ function goForward(rover) {
               {
             console.log("Aargh Alien!!");
             //var alertalien=document.getElementById('alertalien');
-            alertalien.setAttribute("style","display: block;");
+            shakeAlien(roverpred, rover, axis);
+            //alertalien.setAttribute("style","display: block;");
             //alertalien.addEventListener("click",function(){
             //  alertalien.setAttribute("style","display: none;");
             //  roverinput.focus();
@@ -234,7 +245,7 @@ function goForward(rover) {
               ||
               (myRoverine.roverready)&&(roverpred===myRover.position[0])&&(myRoverine.position[1]===myRover.position[1]))
       {
-        alert("something here");
+        displayRoverAlert(overlay_2rover);
       }
 
       else{
@@ -249,6 +260,7 @@ function goForward(rover) {
   };
 
   console.log("New Rover Position: [" + rover.position[0] + ", " + rover.position[1] + "]")
+  //document.getElementById("alien72").removeAttribute("class","shake");
 }
 
 
@@ -339,128 +351,6 @@ function goForward(rover) {
 
   }
 
-  /*function goForward(rover) {
-    switch(rover.direction) {
-      case 'N':
-        var roverpred=rover.position[1]+1;
-        // !!!!! if I do this var roverpred=rover.position[1]++ it will increase number in original object MyRover!
-        console.log(rover.position[1]);
-        console.log("alien" + rover.obstacles[0][0],rover.obstacles[0][1]);
-        if (rover.position[1]===9){
-
-            console.log("cannot move further North");
-
-        }
-
-        else if ((roverpred===rover.obstacles[0][1])&&(rover.position[0]===rover.obstacles[0][0])
-                ||
-                (roverpred===rover.obstacles[1][1])&&(rover.position[0]===rover.obstacles[1][0])
-                ||
-                (roverpred===rover.obstacles[2][1])&&(rover.position[0]===rover.obstacles[2][0]))
-                {
-
-              console.log("Aargh Alien!!");
-              alertalien.setAttribute("style","display: block;");
-
-        }
-
-        else{
-          rover.position[1]++;
-          var posx=rover.positionx;
-          var posy=rover.positiony+100 + "px";
-          rover.positiony+=100;
-          console.log(rover.positiony);
-          console.log(posx, posy);
-          document.getElementById("svg-wrapper").setAttribute(
-          "style", "position: absolute; bottom:"+ posy +"; left:" + posx +";");
-        }
-        break;
-      case 'E':
-        var roverpred=rover.position[0]+1;
-        if (rover.position[0]===9){
-          console.log("cannot move further East");
-        }
-        else if ((roverpred===rover.obstacles[0][0])&&(rover.position[1]===rover.obstacles[0][1])
-                ||
-                (roverpred===rover.obstacles[1][0])&&(rover.position[1]===rover.obstacles[1][1])
-                ||
-                (roverpred===rover.obstacles[2][0])&&(rover.position[1]===rover.obstacles[2][1]))
-                {
-
-              console.log("Aargh Alien!!");
-              alertalien.setAttribute("style","display: block;");
-        }
-        else{
-          rover.position[0]++;
-          var posx=rover.positionx+100 + "px";
-          var posy=rover.positiony;
-          rover.positionx+=100;
-          document.getElementById("svg-wrapper").setAttribute(
-          "style", "position: absolute; bottom:"+ posy +"; left:" + posx +";");
-        }
-        break;
-      case 'S':
-        var roverpred=rover.position[1]-1;
-        if (rover.position[1]===0){
-          console.log("cannot move further South");
-        }
-        else if ((roverpred===rover.obstacles[0][1])&&(rover.position[0]===rover.obstacles[0][0])
-                ||
-                (roverpred===rover.obstacles[1][1])&&(rover.position[0]===rover.obstacles[1][0])
-                ||
-                (roverpred===rover.obstacles[2][1])&&(rover.position[0]===rover.obstacles[2][0]))
-                {
-
-              console.log("Aargh Alien!!");
-              alertalien.setAttribute("style","display: block;");
-
-
-        }
-        else{
-          rover.position[1]--;
-          var posx=rover.positionx;
-          var posy=rover.positiony-100 + "px";
-          rover.positiony-=100;
-          document.getElementById("svg-wrapper").setAttribute(
-          "style", "position: absolute; bottom:"+ posy +"; left:" + posx +";");
-        }
-        break;
-      case 'W':
-        var roverpred=rover.position[0]-1;
-        if (rover.position[0]===0){
-          console.log("cannot move further West");
-        }
-        else if ((roverpred===rover.obstacles[0][0])&&(rover.position[1]===rover.obstacles[0][1])
-                ||
-                (roverpred===rover.obstacles[1][0])&&(rover.position[1]===rover.obstacles[1][1])
-                ||
-                (roverpred===rover.obstacles[2][0])&&(rover.position[1]===rover.obstacles[2][1]))
-                {
-
-              console.log("Aargh Alien!!");
-              //var alertalien=document.getElementById('alertalien');
-              alertalien.setAttribute("style","display: block;");
-              //alertalien.addEventListener("click",function(){
-              //  alertalien.setAttribute("style","display: none;");
-              //  roverinput.focus();
-
-              //})
-
-        }
-
-        else{
-          rover.position[0]--;
-          var posx=rover.positionx-100 + "px";
-          var posy=rover.positiony;
-          rover.positionx-=100;
-          document.getElementById("svg-wrapper").setAttribute(
-          "style", "position: absolute; bottom:"+ posy +"; left:" + posx +";");
-        }
-        break;
-    };
-
-    console.log("New Rover Position: [" + rover.position[0] + ", " + rover.position[1] + "]")
-  }*/
 
 
   function checkCommand(input,rovergender){
@@ -501,6 +391,7 @@ function goForward(rover) {
 
 
     function goBackward(rover) {
+      var overlay_2rover=document.getElementById('alertrover');
       var currentRover;
       if(rover===myRover){
         currentRover="svg-wrapper";
@@ -511,6 +402,7 @@ function goForward(rover) {
 
       switch(rover.direction) {
         case 'N':
+          var axis='Y';
           var roverpred=rover.position[1]-1;
           // !!!!! if I do this var roverpred=rover.position[1]++ it will increase number in original object MyRover!
           console.log(rover.position[1]);
@@ -529,14 +421,15 @@ function goForward(rover) {
                   {
 
                 console.log("Aargh Alien!!");
-                alertalien.setAttribute("style","display: block;");
+                shakeAlien(roverpred, rover, axis);
+                //alertalien.setAttribute("style","display: block;");
 
           }
           else if ((myRover.roverready)&&(roverpred===myRoverine.position[1])&&(myRover.position[0]===myRoverine.position[0])
                   ||
                   (myRoverine.roverready)&&(roverpred===myRover.position[1])&&(myRoverine.position[0]===myRover.position[0]))
           {
-            alert("something here");
+            displayRoverAlert(overlay_2rover);
           }
 
           else{
@@ -551,6 +444,7 @@ function goForward(rover) {
           }
           break;
         case 'E':
+          var axis='X';
           var roverpred=rover.position[0]-1;
           if (rover.position[0]===0){
             console.log("cannot move further East");
@@ -563,13 +457,14 @@ function goForward(rover) {
                   {
 
                 console.log("Aargh Alien!!");
-                alertalien.setAttribute("style","display: block;");
+                //alertalien.setAttribute("style","display: block;");
+                shakeAlien(roverpred, rover, axis);
           }
           else if ((myRover.roverready)&&(roverpred===myRoverine.position[0])&&(myRover.position[1]===myRoverine.position[1])
                   ||
                   (myRoverine.roverready)&&(roverpred===myRover.position[0])&&(myRoverine.position[1]===myRover.position[1]))
           {
-            alert("something here");
+            displayRoverAlert(overlay_2rover);
           }
 
           else{
@@ -582,6 +477,7 @@ function goForward(rover) {
           }
           break;
         case 'S':
+          var axis='Y';
           var roverpred=rover.position[1]+1;
           if (rover.position[1]===9){
             console.log("cannot move further North");
@@ -594,15 +490,15 @@ function goForward(rover) {
                   {
 
                 console.log("Aargh Alien!!");
-                alertalien.setAttribute("style","display: block;");
-
+                //alertalien.setAttribute("style","display: block;");
+                shakeAlien(roverpred,rover, axis);
 
           }
           else if ((myRover.roverready)&&(roverpred===myRoverine.position[1])&&(myRover.position[0]===myRoverine.position[0])
                   ||
                   (myRoverine.roverready)&&(roverpred===myRover.position[1])&&(myRoverine.position[0]===myRover.position[0]))
           {
-            alert("something here");
+            displayRoverAlert(overlay_2rover);
           }
 
           else{
@@ -615,6 +511,7 @@ function goForward(rover) {
           }
           break;
         case 'W':
+          var axis='X';
           var roverpred=rover.position[0]+1;
           if (rover.position[0]===9){
             console.log("cannot move further West");
@@ -627,20 +524,19 @@ function goForward(rover) {
                   {
 
                 console.log("Aargh Alien!!");
+                shakeAlien(roverpred, rover, axis);
                 //var alertalien=document.getElementById('alertalien');
-                alertalien.setAttribute("style","display: block;");
+                //alertalien.setAttribute("style","display: block;");
                 //alertalien.addEventListener("click",function(){
-                //  alertalien.setAttribute("style","display: none;");
-                //  roverinput.focus();
-
-                //})
-
+                //alertalien.setAttribute("style","display: none;");
+                //roverinput.focus();
+                //}
           }
           else if ((myRover.roverready)&&(roverpred===myRoverine.position[0])&&(myRover.position[1]===myRoverine.position[1])
                   ||
                   (myRoverine.roverready)&&(roverpred===myRover.position[0])&&(myRoverine.position[1]===myRover.position[1]))
           {
-            alert("something here");
+            displayRoverAlert(overlay_2rover);
           }
 
           else{
@@ -658,16 +554,92 @@ function goForward(rover) {
     }
 
 
+    function shakeAlien(roverpred, rover, axis){
+      //alert("inside shake");
+      switch(axis){
 
-//1) Create an object to represent the rover that has position and direction attributes
-//2) Create a grid using arrays (hint: do a google search for two-dimensional arrays).
-//3) Write functions for the various commands
-//4) Try to call some of those functions and display the new position of the rover.
+        case "X":{
+          if ((roverpred===rover.obstacles[1][0])&&(rover.position[1]===rover.obstacles[1][1])){
+            
+            var alien72=document.getElementById("alien72");
+            console.log("alien72", alien72);
+            alien72.setAttribute("class", "shake");
+            alien72.addEventListener("animationend", function(event){
+              alien72.removeAttribute("class","shake");
 
-//commands should be go forward, backward etc  f for go forward
-//b for go back
-//r for turn right*
-//l for turn left*
-//So we should be able to tell the rover, for example, ‘fffrfflfffbb’ and it would execute those movements and provide us with its new position.
+            });
+          }
+          else if ((roverpred===rover.obstacles[0][0])&&(rover.position[1]===rover.obstacles[0][1])){
 
-//Furthermore, we need to make sure that the rover never goes off the grid but rather, wraps from one edge of the grid to another (planets are spheres after all)
+            var alien23=document.getElementById("alien23");
+            console.log("alien23", alien23);
+            alien23.setAttribute("class", "shake");
+            alien23.addEventListener("animationend", function(event){
+              alien23.removeAttribute("class","shake");
+
+            });
+          }
+          else if((roverpred===rover.obstacles[2][0])&&(rover.position[1]===rover.obstacles[2][1])){
+
+            var alien36=document.getElementById("alien36");
+            console.log("alien36", alien36);
+            alien36.setAttribute("class", "shake");
+            alien36.addEventListener("animationend", function(event){
+              alien36.removeAttribute("class","shake");
+
+          });
+        }
+        break;
+      }//case X end
+      case "Y":{
+        if ((roverpred===rover.obstacles[1][1])&&(rover.position[0]===rover.obstacles[1][0])){
+
+          var alien72=document.getElementById("alien72");
+          console.log("alien72", alien72);
+          alien72.setAttribute("class", "shake");
+          alien72.addEventListener("animationend", function(event){
+            alien72.removeAttribute("class","shake");
+
+          });
+        }
+        else if ((roverpred===rover.obstacles[0][1])&&(rover.position[0]===rover.obstacles[0][0])){
+
+          var alien23=document.getElementById("alien23");
+          console.log("alien23", alien23);
+          alien23.setAttribute("class", "shake");
+          alien23.addEventListener("animationend", function(event){
+            alien23.removeAttribute("class","shake");
+
+          });
+        }
+        else if((roverpred===rover.obstacles[2][1])&&(rover.position[0]===rover.obstacles[2][0])){
+
+          var alien36=document.getElementById("alien36");
+          console.log("alien36", alien36);
+          alien36.setAttribute("class", "shake");
+          alien36.addEventListener("animationend", function(event){
+            alien36.removeAttribute("class","shake");
+
+        });
+      }
+      break;
+    }//case Y end
+    }//switch end
+
+  }//function end
+
+  function displayRoverAlert(overlay_2rover){
+
+    overlay_2rover.setAttribute("style", "display:block");
+    overlay_2rover.addEventListener("click", function(){
+        this.setAttribute("style", "display:none;");
+        if(myRover.roverready){
+          roverinput.focus();
+        }
+        else if(myRoverine.roverready){
+          roverineinput.focus();
+        }
+
+
+    });
+  }
