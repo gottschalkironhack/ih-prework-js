@@ -1,4 +1,5 @@
 //keypressEvent
+var foo = "bar";
 
 var myRover = {
   position: [0,0],
