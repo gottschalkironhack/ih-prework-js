@@ -1,5 +1,4 @@
 //keypressEvent
-var foo = "bar";
 
 var myRover = {
   position: [0,0],
@@ -561,7 +560,7 @@ function goForward(rover) {
 
         case "X":{
           if ((roverpred===rover.obstacles[1][0])&&(rover.position[1]===rover.obstacles[1][1])){
-            
+
             var alien72=document.getElementById("alien72");
             console.log("alien72", alien72);
             alien72.setAttribute("class", "shake");
